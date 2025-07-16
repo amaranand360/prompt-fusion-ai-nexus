@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -21,7 +20,14 @@ import {
   Clock,
   Users,
   ArrowUp,
-  Paperclip
+  Paperclip,
+  Globe,
+  ChevronRight,
+  Play,
+  MessageSquare,
+  BarChart,
+  Settings,
+  Zap
 } from 'lucide-react';
 
 interface SearchResult {
@@ -39,6 +45,13 @@ interface SearchResult {
   citations: string[];
 }
 
+interface ConnectedTool {
+  name: string;
+  icon: React.ElementType;
+  color: string;
+  connected: boolean;
+}
+
 const mockResults: SearchResult[] = [
   {
     id: '1',
@@ -53,41 +66,75 @@ const mockResults: SearchResult[] = [
       fileType: 'PDF'
     },
     citations: ['Marketing Budget 2024.xlsx', 'Customer Survey Results.pdf']
-  },
-  {
-    id: '2',
-    title: 'Team Standup - Project Alpha',
-    content: 'Daily standup discussing progress on Project Alpha development...',
-    source: 'Slack',
-    type: 'slack',
-    preview: 'Discussion about sprint progress, blockers, and next steps for the alpha release.',
-    metadata: {
-      date: '2024-01-14',
-      author: 'Dev Team'
-    },
-    citations: ['Sprint Planning Board', 'Technical Requirements Doc']
   }
 ];
 
-const toolSuggestions = [
+const trendingSearches = [
+  { query: "Summarize team meeting notes", count: 245 },
+  { query: "Create project timeline", count: 189 },
+  { query: "Schedule follow-up emails", count: 167 },
+  { query: "Generate weekly report", count: 143 },
+  { query: "Find customer feedback", count: 128 },
+];
+
+const suggestedActions = [
   {
-    icon: Calendar,
-    title: 'Sprint Planning',
-    description: 'Look at Linear and create a sprint plan for the next 2 weeks',
-    color: 'from-blue-500 to-purple-500'
+    title: "Sales Research before Meetings",
+    description: "Research all my meetings for today and email me notes to prep",
+    icons: [Mail, Calendar],
+    category: "Productivity"
   },
   {
-    icon: FileText,
-    title: 'Summarize Meetings',
-    description: 'Summarize my key meetings this week from Google Calendar',
-    color: 'from-green-500 to-blue-500'
+    title: "Sprint Planning",
+    description: "Use linear to make a brief sprint plan doc for next 2 weeks",
+    icons: [Calendar, FileText],
+    category: "Planning"
   },
   {
-    icon: Mail,
-    title: 'Scan Emails',
-    description: 'Check my emails and send out meetings to anyone needed',
-    color: 'from-red-500 to-pink-500'
+    title: "Find Contact Info from LinkedIn",
+    description: "Given a LinkedIn profile, find the contact info",
+    icons: [Globe, Users],
+    category: "Research"
+  },
+  {
+    title: "Overnight Updates",
+    description: "Update me on overnight slack/email messages",
+    icons: [Slack, Mail],
+    category: "Updates"
+  },
+  {
+    title: "Follow-Up Email Automation",
+    description: "Automatically send follow-up emails to leads",
+    icons: [Mail, Zap],
+    category: "Automation"
+  },
+  {
+    title: "Inbound Lead Qualification",
+    description: "Qualify inbound leads automatically",
+    icons: [Users, BarChart],
+    category: "Sales"
+  },
+  {
+    title: "Content Calendar",
+    description: "From a campaign document generate a full content calendar",
+    icons: [Calendar, FileText],
+    category: "Marketing"
+  },
+  {
+    title: "Expense Analysis",
+    description: "Analyze my expenses and generate a report",
+    icons: [BarChart, FileText],
+    category: "Finance"
   }
+];
+
+const connectedTools: ConnectedTool[] = [
+  { name: "Gmail", icon: Mail, color: "text-red-500", connected: true },
+  { name: "Calendar", icon: Calendar, color: "text-blue-500", connected: true },
+  { name: "Slack", icon: MessageSquare, color: "text-purple-500", connected: true },
+  { name: "Notion", icon: FileText, color: "text-gray-700", connected: false },
+  { name: "Linear", icon: Settings, color: "text-indigo-500", connected: false },
+  { name: "LinkedIn", icon: Globe, color: "text-blue-600", connected: false },
 ];
 
 export const SearchInterface = () => {
@@ -95,12 +142,29 @@ export const SearchInterface = () => {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showConnectedTools, setShowConnectedTools] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+        setShowConnectedTools(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleSearch = async () => {
     if (!query.trim()) return;
     
     setIsSearching(true);
     setShowSuggestions(false);
+    setShowConnectedTools(false);
     // Simulate API call
     setTimeout(() => {
       setResults(mockResults);
@@ -112,13 +176,18 @@ export const SearchInterface = () => {
     setShowSuggestions(true);
   };
 
-  const handleBlur = () => {
-    // Delay hiding to allow clicks on suggestions
-    setTimeout(() => setShowSuggestions(false), 150);
-  };
-
   const handleSuggestionClick = (suggestion: string) => {
     setQuery(suggestion);
+    setShowSuggestions(false);
+  };
+
+  const handleActionClick = (action: typeof suggestedActions[0]) => {
+    setQuery(action.description);
+    setShowSuggestions(false);
+  };
+
+  const toggleConnectedTools = () => {
+    setShowConnectedTools(!showConnectedTools);
     setShowSuggestions(false);
   };
 
@@ -143,101 +212,181 @@ export const SearchInterface = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-8" ref={searchRef}>
       {/* Enhanced Search Bar */}
       <div className="relative">
-        <div className="relative flex items-center">
-          <div className="absolute left-6 flex items-center gap-2">
-            <Paperclip className="h-5 w-5 text-gray-400" />
-            <span className="text-gray-400">+</span>
-            <span className="text-sm text-gray-400">Add integration</span>
+        <div className="relative">
+          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 flex items-center gap-3 z-10">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleConnectedTools}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+            >
+              <Paperclip className="h-4 w-4 text-gray-500" />
+              <Plus className="h-3 w-3 text-gray-500" />
+            </Button>
+            <span className="text-sm text-gray-500">Add integration</span>
           </div>
+          
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Summarize my key meetings this week from Google Calendar, create an agenda for each, and email it to me."
-            className="pl-48 pr-16 h-20 text-lg bg-gray-800/50 border-2 border-gray-600 focus:border-purple-500 rounded-2xl shadow-2xl text-white placeholder:text-gray-400 backdrop-blur-sm"
+            className="pl-48 pr-16 h-16 text-base bg-background/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 focus:border-purple-500 dark:focus:border-purple-400 rounded-2xl shadow-lg text-foreground placeholder:text-muted-foreground transition-all duration-200"
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
             onFocus={handleFocus}
-            onBlur={handleBlur}
           />
-          <div className="absolute right-4">
+          
+          <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
             <Button 
               onClick={handleSearch}
               disabled={isSearching}
-              className="h-12 w-12 bg-white hover:bg-gray-100 rounded-full shadow-lg"
+              className="h-10 w-10 bg-foreground hover:bg-foreground/90 rounded-full shadow-lg"
               size="icon"
             >
-              <ArrowUp className="h-5 w-5 text-gray-900" />
+              <ArrowUp className="h-4 w-4 text-background" />
             </Button>
           </div>
         </div>
-      </div>
 
-      {/* Tool Suggestions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {toolSuggestions.map((tool, index) => (
-          <Card 
-            key={index}
-            className="p-6 bg-gray-800/50 border-gray-700 backdrop-blur-sm hover:bg-gray-800/70 transition-all cursor-pointer group"
-            onClick={() => handleSuggestionClick(tool.description)}
-          >
-            <div className="flex items-start gap-4">
-              <div className={`p-3 rounded-lg bg-gradient-to-r ${tool.color} opacity-80 group-hover:opacity-100 transition-opacity`}>
-                <tool.icon className="h-6 w-6 text-white" />
+        {/* Connected Tools Dropdown */}
+        {showConnectedTools && (
+          <Card className="absolute top-full left-0 right-0 mt-2 p-4 bg-background/95 backdrop-blur-sm border shadow-xl z-50">
+            <h3 className="text-sm font-semibold text-foreground mb-3">Connected Tools</h3>
+            <div className="grid grid-cols-3 gap-3">
+              {connectedTools.map((tool, index) => (
+                <div
+                  key={index}
+                  className={`flex items-center gap-2 p-2 rounded-lg border transition-colors cursor-pointer ${
+                    tool.connected 
+                      ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
+                      : 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <tool.icon className={`h-4 w-4 ${tool.color}`} />
+                  <span className="text-xs font-medium text-foreground">{tool.name}</span>
+                  {tool.connected && (
+                    <div className="w-2 h-2 bg-green-500 rounded-full ml-auto"></div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* Suggestions Dropdown */}
+        {showSuggestions && !showConnectedTools && (
+          <Card className="absolute top-full left-0 right-0 mt-2 p-6 bg-background/95 backdrop-blur-sm border shadow-xl z-50">
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Trending Searches */}
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  Trending Searches
+                </h3>
+                <div className="space-y-2">
+                  {trendingSearches.map((search, index) => (
+                    <div
+                      key={index}
+                      onClick={() => handleSuggestionClick(search.query)}
+                      className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer group transition-colors"
+                    >
+                      <span className="text-sm text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400">
+                        {search.query}
+                      </span>
+                      <span className="text-xs text-muted-foreground">{search.count}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-white mb-2">{tool.title}</h3>
-                <p className="text-sm text-gray-400 leading-relaxed">{tool.description}</p>
+
+              {/* Suggested Actions */}
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                  <Sparkles className="h-4 w-4" />
+                  Suggested Actions
+                </h3>
+                <div className="grid gap-2 max-h-64 overflow-y-auto">
+                  {suggestedActions.map((action, index) => (
+                    <div
+                      key={index}
+                      onClick={() => handleActionClick(action)}
+                      className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer group transition-all duration-200"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="flex items-center gap-1">
+                          {action.icons.map((Icon, iconIndex) => (
+                            <Icon key={iconIndex} className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                          ))}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-medium text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                            {action.title}
+                          </h4>
+                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                            {action.description}
+                          </p>
+                          <Badge variant="secondary" className="mt-2 text-xs">
+                            {action.category}
+                          </Badge>
+                        </div>
+                        <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Play className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </Card>
-        ))}
+        )}
       </div>
 
       {/* Search Results */}
       {results.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-white">
+          <h2 className="text-xl font-semibold text-foreground">
             Search Results ({results.length})
           </h2>
           
           {results.map((result) => (
-            <Card key={result.id} className="p-6 bg-gray-800/50 border-gray-700 backdrop-blur-sm hover:bg-gray-800/70 transition-all">
+            <Card key={result.id} className="p-6 bg-background/50 backdrop-blur-sm border hover:bg-background/70 transition-all">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <Badge className={`${getTypeColor(result.type)} flex items-center gap-1`}>
                     {getTypeIcon(result.type)}
                     {result.source}
                   </Badge>
-                  <span className="text-sm text-gray-400">
+                  <span className="text-sm text-muted-foreground">
                     {result.metadata.date} • {result.metadata.author}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                     <Share className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                     <Download className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                     <ExternalLink className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
               
-              <h3 className="text-lg font-medium text-white mb-2">
+              <h3 className="text-lg font-medium text-foreground mb-2">
                 {result.title}
               </h3>
               
-              <p className="text-gray-300 mb-4 leading-relaxed">
+              <p className="text-muted-foreground mb-4 leading-relaxed">
                 {result.preview}
               </p>
               
               {result.citations.length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                  <span className="text-sm text-gray-400">Related:</span>
+                  <span className="text-sm text-muted-foreground">Related:</span>
                   {result.citations.map((citation, index) => (
                     <Badge key={index} variant="secondary" className="text-xs bg-gray-700/50 text-gray-300 border-gray-600">
                       {citation}

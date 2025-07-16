@@ -4,21 +4,23 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Bell, Settings } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export const Header = () => {
   return (
-    <header className="h-16 border-b bg-white/80 backdrop-blur-sm flex items-center justify-between px-6">
+    <header className="h-16 border-b bg-background/80 backdrop-blur-sm flex items-center justify-between px-6">
       <div className="flex items-center gap-4">
         <SidebarTrigger />
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-sm">E</span>
           </div>
-          <h1 className="text-xl font-semibold text-gray-900">Enterprise Search</h1>
+          <h1 className="text-xl font-semibold text-foreground">Enterprise Search</h1>
         </div>
       </div>
       
       <div className="flex items-center gap-3">
+        <ThemeToggle />
         <Button variant="ghost" size="sm" className="relative">
           <Bell className="h-4 w-4" />
           <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>

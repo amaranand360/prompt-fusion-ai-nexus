@@ -44,18 +44,18 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/80">
       <div className="space-y-12 p-8">
         {/* Hero Section */}
         <div className="text-center space-y-6 pt-16 pb-8">
-          <h1 className="text-6xl font-bold text-white mb-4">
+          <h1 className="text-6xl font-bold text-foreground mb-4">
             Words to actions{' '}
             <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
               in seconds
             </span>
           </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Enterprise Search is your AI agent for Gmail, Calendar, Notion, and more
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Dash is your AI agent for Gmail, Calendar, Notion, and more
           </p>
         </div>
 
@@ -65,11 +65,11 @@ const Dashboard = () => {
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
           {stats.map((stat, index) => (
-            <Card key={index} className="p-6 bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+            <Card key={index} className="p-6 bg-background/50 border backdrop-blur-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-400">{stat.label}</p>
-                  <p className="text-2xl font-bold text-white">{stat.value}</p>
+                  <p className="text-sm text-muted-foreground">{stat.label}</p>
+                  <p className="text-2xl font-bold text-foreground">{stat.value}</p>
                 </div>
                 <div className="p-3 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-lg">
                   <stat.icon className="h-6 w-6 text-purple-400" />
@@ -78,7 +78,7 @@ const Dashboard = () => {
               <div className="mt-4 flex items-center">
                 <TrendingUp className="h-4 w-4 text-green-400 mr-1" />
                 <span className="text-sm text-green-400">{stat.trend}</span>
-                <span className="text-sm text-gray-400 ml-1">vs last month</span>
+                <span className="text-sm text-muted-foreground ml-1">vs last month</span>
               </div>
             </Card>
           ))}
@@ -86,24 +86,24 @@ const Dashboard = () => {
 
         {/* Recent Actions */}
         <div className="max-w-6xl mx-auto">
-          <Card className="p-6 bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+          <Card className="p-6 bg-background/50 border backdrop-blur-sm">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-white">Recent Actions</h3>
-              <Button variant="outline" size="sm" className="bg-gray-700/50 border-gray-600 text-gray-300 hover:bg-gray-600/50">
+              <h3 className="text-lg font-semibold text-foreground">Recent Actions</h3>
+              <Button variant="outline" size="sm" className="bg-background/50 border hover:bg-background/70">
                 View All
               </Button>
             </div>
             
             <div className="space-y-4">
               {recentActions.map((action, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-gray-700/30 rounded-lg border border-gray-600/50">
+                <div key={index} className="flex items-center justify-between p-4 bg-background/30 rounded-lg border">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
                       <Star className="h-4 w-4 text-white" />
                     </div>
                     <div>
-                      <p className="font-medium text-white">{action.action}</p>
-                      <p className="text-sm text-gray-400">by {action.user} • {action.time}</p>
+                      <p className="font-medium text-foreground">{action.action}</p>
+                      <p className="text-sm text-muted-foreground">by {action.user} • {action.time}</p>
                     </div>
                   </div>
                   <Badge className={action.status === 'completed' ? 'bg-green-600/20 text-green-400 border-green-600/30' : 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30'}>

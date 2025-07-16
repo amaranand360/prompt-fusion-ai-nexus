@@ -8,7 +8,7 @@ import { Header } from '@/components/Header';
 export const Layout = () => {
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-background via-background to-background/90">
         <AppSidebar />
         <div className="flex-1 flex flex-col">
           <Header />
