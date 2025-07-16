@@ -19,7 +19,9 @@ import {
   Plus,
   TrendingUp,
   Clock,
-  Users
+  Users,
+  ArrowUp,
+  Paperclip
 } from 'lucide-react';
 
 interface SearchResult {
@@ -67,19 +69,25 @@ const mockResults: SearchResult[] = [
   }
 ];
 
-const trendingSearches = [
-  { query: 'Q4 budget planning', count: 145, icon: TrendingUp },
-  { query: 'Team performance metrics', count: 89, icon: Users },
-  { query: 'Product roadmap 2024', count: 73, icon: Calendar },
-  { query: 'Marketing campaign analysis', count: 62, icon: FileText }
-];
-
-const suggestedActions = [
-  'Create presentation from last meeting notes',
-  'Schedule weekly team sync',
-  'Generate expense report',
-  'Find similar documents to current project',
-  'Summarize email thread from yesterday'
+const toolSuggestions = [
+  {
+    icon: Calendar,
+    title: 'Sprint Planning',
+    description: 'Look at Linear and create a sprint plan for the next 2 weeks',
+    color: 'from-blue-500 to-purple-500'
+  },
+  {
+    icon: FileText,
+    title: 'Summarize Meetings',
+    description: 'Summarize my key meetings this week from Google Calendar',
+    color: 'from-green-500 to-blue-500'
+  },
+  {
+    icon: Mail,
+    title: 'Scan Emails',
+    description: 'Check my emails and send out meetings to anyone needed',
+    color: 'from-red-500 to-pink-500'
+  }
 ];
 
 export const SearchInterface = () => {
@@ -126,166 +134,112 @@ export const SearchInterface = () => {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'document': return 'bg-blue-100 text-blue-700';
-      case 'email': return 'bg-green-100 text-green-700';
-      case 'calendar': return 'bg-purple-100 text-purple-700';
-      case 'slack': return 'bg-orange-100 text-orange-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case 'document': return 'bg-blue-600/20 text-blue-400 border-blue-600/30';
+      case 'email': return 'bg-green-600/20 text-green-400 border-green-600/30';
+      case 'calendar': return 'bg-purple-600/20 text-purple-400 border-purple-600/30';
+      case 'slack': return 'bg-orange-600/20 text-orange-400 border-orange-600/30';
+      default: return 'bg-gray-600/20 text-gray-400 border-gray-600/30';
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Search Bar */}
+    <div className="max-w-4xl mx-auto space-y-8">
+      {/* Enhanced Search Bar */}
       <div className="relative">
         <div className="relative flex items-center">
-          <Search className="absolute left-4 h-5 w-5 text-gray-400" />
+          <div className="absolute left-6 flex items-center gap-2">
+            <Paperclip className="h-5 w-5 text-gray-400" />
+            <span className="text-gray-400">+</span>
+            <span className="text-sm text-gray-400">Add integration</span>
+          </div>
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search across all your apps or ask Kroolo to help you with any task..."
-            className="pl-12 pr-20 h-16 text-lg border-2 border-gray-200 focus:border-blue-500 rounded-2xl shadow-lg"
+            placeholder="Summarize my key meetings this week from Google Calendar, create an agenda for each, and email it to me."
+            className="pl-48 pr-16 h-20 text-lg bg-gray-800/50 border-2 border-gray-600 focus:border-purple-500 rounded-2xl shadow-2xl text-white placeholder:text-gray-400 backdrop-blur-sm"
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
             onFocus={handleFocus}
             onBlur={handleBlur}
           />
-          <div className="absolute right-2 flex items-center gap-2">
-            <Button variant="ghost" size="sm" className="h-12 w-12 rounded-xl">
-              <Mic className="h-5 w-5" />
-            </Button>
+          <div className="absolute right-4">
             <Button 
               onClick={handleSearch}
               disabled={isSearching}
-              className="h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl px-6"
+              className="h-12 w-12 bg-white hover:bg-gray-100 rounded-full shadow-lg"
+              size="icon"
             >
-              <Sparkles className="h-5 w-5 mr-2" />
-              {isSearching ? 'Searching...' : 'Search'}
+              <ArrowUp className="h-5 w-5 text-gray-900" />
             </Button>
           </div>
         </div>
+      </div>
 
-        {/* Suggestions Dropdown */}
-        {showSuggestions && (
-          <Card className="absolute top-full left-0 right-0 mt-2 p-4 shadow-2xl border-2 z-50 bg-white">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Trending Searches */}
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <TrendingUp className="h-4 w-4 text-orange-500" />
-                  <h3 className="font-medium text-gray-900">Trending</h3>
-                </div>
-                <div className="space-y-2">
-                  {trendingSearches.map((trend, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleSuggestionClick(trend.query)}
-                      className="w-full flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg text-left"
-                    >
-                      <div className="flex items-center gap-2">
-                        <trend.icon className="h-3 w-3 text-gray-400" />
-                        <span className="text-sm text-gray-700">{trend.query}</span>
-                      </div>
-                      <Badge variant="secondary" className="text-xs">
-                        {trend.count}
-                      </Badge>
-                    </button>
-                  ))}
-                </div>
+      {/* Tool Suggestions */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {toolSuggestions.map((tool, index) => (
+          <Card 
+            key={index}
+            className="p-6 bg-gray-800/50 border-gray-700 backdrop-blur-sm hover:bg-gray-800/70 transition-all cursor-pointer group"
+            onClick={() => handleSuggestionClick(tool.description)}
+          >
+            <div className="flex items-start gap-4">
+              <div className={`p-3 rounded-lg bg-gradient-to-r ${tool.color} opacity-80 group-hover:opacity-100 transition-opacity`}>
+                <tool.icon className="h-6 w-6 text-white" />
               </div>
-
-              {/* Suggested Actions */}
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="h-4 w-4 text-blue-500" />
-                  <h3 className="font-medium text-gray-900">Suggested Actions</h3>
-                </div>
-                <div className="space-y-2">
-                  {suggestedActions.map((action, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleSuggestionClick(action)}
-                      className="w-full flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg text-left"
-                    >
-                      <Plus className="h-3 w-3 text-gray-400" />
-                      <span className="text-sm text-gray-700">{action}</span>
-                    </button>
-                  ))}
-                </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-white mb-2">{tool.title}</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">{tool.description}</p>
               </div>
             </div>
           </Card>
-        )}
+        ))}
       </div>
-
-      {/* Quick Actions */}
-      {!showSuggestions && (
-        <div className="flex flex-wrap gap-2 justify-center">
-          {[
-            'Create presentation',
-            'Schedule meeting',
-            'Send email update',
-            'Generate report',
-            'Find documents'
-          ].map((action) => (
-            <Button 
-              key={action} 
-              variant="outline" 
-              size="sm" 
-              className="rounded-full hover:bg-blue-50 hover:border-blue-300"
-              onClick={() => handleSuggestionClick(action)}
-            >
-              <Plus className="h-3 w-3 mr-1" />
-              {action}
-            </Button>
-          ))}
-        </div>
-      )}
 
       {/* Search Results */}
       {results.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-xl font-semibold text-white">
             Search Results ({results.length})
           </h2>
           
           {results.map((result) => (
-            <Card key={result.id} className="p-6 hover:shadow-lg transition-shadow">
+            <Card key={result.id} className="p-6 bg-gray-800/50 border-gray-700 backdrop-blur-sm hover:bg-gray-800/70 transition-all">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <Badge className={`${getTypeColor(result.type)} flex items-center gap-1`}>
                     {getTypeIcon(result.type)}
                     {result.source}
                   </Badge>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-400">
                     {result.metadata.date} • {result.metadata.author}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
                     <Share className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
                     <Download className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
                     <ExternalLink className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
               
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-white mb-2">
                 {result.title}
               </h3>
               
-              <p className="text-gray-600 mb-4 leading-relaxed">
+              <p className="text-gray-300 mb-4 leading-relaxed">
                 {result.preview}
               </p>
               
               {result.citations.length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                  <span className="text-sm text-gray-500">Related:</span>
+                  <span className="text-sm text-gray-400">Related:</span>
                   {result.citations.map((citation, index) => (
-                    <Badge key={index} variant="secondary" className="text-xs">
+                    <Badge key={index} variant="secondary" className="text-xs bg-gray-700/50 text-gray-300 border-gray-600">
                       {citation}
                     </Badge>
                   ))}

@@ -11,10 +11,10 @@ export const Header = () => {
       <div className="flex items-center gap-4">
         <SidebarTrigger />
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">K</span>
+          <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-sm">E</span>
           </div>
-          <h1 className="text-xl font-semibold text-gray-900">Kroolo</h1>
+          <h1 className="text-xl font-semibold text-gray-900">Enterprise Search</h1>
         </div>
       </div>
       
@@ -27,7 +27,7 @@ export const Header = () => {
           <Settings className="h-4 w-4" />
         </Button>
         <Avatar className="h-8 w-8">
-          <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm">
+          <AvatarFallback className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm">
             U
           </AvatarFallback>
         </Avatar>
