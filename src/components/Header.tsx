@@ -12,9 +12,9 @@ export const Header = () => {
         <SidebarTrigger />
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">AI</span>
+            <span className="text-white font-bold text-sm">K</span>
           </div>
-          <h1 className="text-xl font-semibold text-gray-900">Brain MAX</h1>
+          <h1 className="text-xl font-semibold text-gray-900">Kroolo</h1>
         </div>
       </div>
       
