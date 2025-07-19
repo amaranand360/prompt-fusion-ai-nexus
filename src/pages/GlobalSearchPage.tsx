@@ -3,9 +3,11 @@ import { GlobalSearchInterface } from '@/components/GlobalSearchInterface';
 import { SearchResults } from '@/components/SearchResults';
 import { ActionExecutionFlow } from '@/components/ActionExecutionFlow';
 import { ActionPreviewData } from '@/components/ActionPreview';
+import { AIAssistantSummary } from '@/components/AIAssistantSummary';
 import { testAgentsService, AgentExecuteRequest } from '@/services/testAgentsService';
+import { openaiService, OpenAIAnalysisResult } from '@/services/openaiService';
 
-type SearchView = 'home' | 'results' | 'action';
+type SearchView = 'home' | 'results' | 'action' | 'ai-analysis';
 
 interface ActionResult {
   id: string;
@@ -28,6 +30,8 @@ export const GlobalSearchPage: React.FC = () => {
   const [currentExecutionResult, setCurrentExecutionResult] = useState<string | null>(null);
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState<OpenAIAnalysisResult | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // Check backend availability on component mount
   useEffect(() => {
@@ -452,9 +456,52 @@ This meeting will help align our strategic direction and ensure we're building t
     }
   };
 
-  const handleSearch = (query: string) => {
+  const handleSearch = async (query: string) => {
     setSearchQuery(query);
-    setCurrentView('results');
+    setIsAnalyzing(true);
+    setAiAnalysis(null);
+
+    try {
+      // Analyze query with OpenAI
+      const analysis = await openaiService.analyzeQuery(query);
+      setAiAnalysis(analysis);
+
+      if (analysis.isValid) {
+        // Show AI analysis view for valid queries
+        setCurrentView('ai-analysis');
+      } else {
+        // For invalid queries, show regular search results
+        setCurrentView('results');
+      }
+    } catch (error) {
+      console.error('Error analyzing query:', error);
+
+      // Create a fallback analysis for testing
+      const fallbackAnalysis: OpenAIAnalysisResult = {
+        isValid: true,
+        taskType: query.toLowerCase().includes('email') ? 'email' :
+                 query.toLowerCase().includes('calendar') || query.toLowerCase().includes('meeting') ? 'meeting' : 'general',
+        summary: `Fallback analysis for: ${query}`,
+        confidence: 85,
+        originalQuery: query,
+        suggestedActions: [
+          'Execute the requested task',
+          'Review and modify details',
+          'Save for later execution'
+        ],
+        executionSteps: [
+          'Analyze the request',
+          'Generate preview if needed',
+          'Execute the task',
+          'Confirm completion'
+        ]
+      };
+
+      setAiAnalysis(fallbackAnalysis);
+      setCurrentView('ai-analysis');
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const handleAction = async (action: string) => {
@@ -471,7 +518,6 @@ This meeting will help align our strategic direction and ensure we're building t
 
     // Generate preview data for the action
     const preview = generatePreviewData(action);
-    console.log('📋 Generated preview data:', preview);
 
     // Set preview data and start fade-in animation
     setPreviewData(preview);
@@ -571,6 +617,21 @@ This meeting will help align our strategic direction and ensure we're building t
     // setPreviewData(preview);
   };
 
+  // AI Assistant handlers
+  const handleAIExecute = (action: string) => {
+    // Use the original query for execution, not the suggested action
+    const queryToExecute = aiAnalysis?.originalQuery || action;
+
+    // Use the existing handleAction function which handles preview generation
+    // and the complete execution flow
+    handleAction(queryToExecute);
+  };
+
+  const handleAIRefine = () => {
+    setCurrentView('home');
+    setAiAnalysis(null);
+  };
+
   const getActionResult = (action: string): string => {
     if (action.toLowerCase().includes('create task')) {
       return 'Task "Intro Me! to new team members" created successfully in Project Board. Assigned to: You. Due date: Next Friday.';
@@ -606,6 +667,38 @@ This meeting will help align our strategic direction and ensure we're building t
             actions={actionResults}
             onActionExecute={handleAction}
           />
+        );
+      case 'ai-analysis':
+        return (
+          <div className="container mx-auto px-4 py-8 max-w-4xl">
+            <div className="mb-6">
+              <button
+                onClick={() => setCurrentView('home')}
+                className="text-muted-foreground hover:text-foreground flex items-center gap-2 mb-4"
+              >
+                ← Back to Search
+              </button>
+              <h1 className="text-2xl font-bold mb-2">AI Analysis Results</h1>
+              <p className="text-muted-foreground">
+                Query: "{searchQuery}"
+              </p>
+            </div>
+
+            {aiAnalysis && (
+              <AIAssistantSummary
+                analysis={aiAnalysis}
+                onExecute={handleAIExecute}
+                onRefine={handleAIRefine}
+                isLoading={isExecutingAction || isGeneratingPreview}
+                previewData={previewData}
+                showPreview={showPreview}
+                onPreviewProceed={handlePreviewProceed}
+                onPreviewProceedDirect={handlePreviewProceedDirect}
+                onPreviewCancel={handlePreviewCancel}
+                isGeneratingPreview={isGeneratingPreview}
+              />
+            )}
+          </div>
         );
       case 'action':
         return (

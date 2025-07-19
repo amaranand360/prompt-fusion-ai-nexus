@@ -60,6 +60,34 @@ export const ActionPreview: React.FC<ActionPreviewProps> = ({
   className = '',
   showContent = true
 }) => {
+  // Add comprehensive null checking and debugging
+  console.log('🎬 ActionPreview received data:', previewData);
+
+  if (!previewData) {
+    console.error('❌ ActionPreview: previewData is null/undefined');
+    return (
+      <Card className={`p-6 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20 ${className}`}>
+        <div className="text-center">
+          <p className="text-red-600 dark:text-red-400">Error: Preview data is null</p>
+        </div>
+      </Card>
+    );
+  }
+
+  if (!previewData.data) {
+    console.error('❌ ActionPreview: previewData.data is null/undefined', previewData);
+    return (
+      <Card className={`p-6 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20 ${className}`}>
+        <div className="text-center">
+          <p className="text-red-600 dark:text-red-400">Error: Preview data.data is not available</p>
+          <p className="text-xs text-red-500 mt-2">Type: {previewData.type}, Action: {previewData.action}</p>
+        </div>
+      </Card>
+    );
+  }
+
+  console.log('✅ ActionPreview: Data is valid, initializing component');
+
   const [formData, setFormData] = useState(previewData.data);
   const [isEditing, setIsEditing] = useState(false);
 

@@ -25,6 +25,8 @@ import { ThemeToggle } from '@/contexts/ThemeContext';
 import { useGoogleIntegration } from '@/contexts/GoogleIntegrationContext';
 import { BackendStatus } from '@/components/BackendStatus';
 import { ActionPreview } from '@/components/ActionPreview';
+import { MicrophoneButton, VoiceRecordingIndicator } from '@/components/MicrophoneButton';
+import { openaiService } from '@/services/openaiService';
 
 interface TrendingSearch {
   id: string;
@@ -109,6 +111,9 @@ export const GlobalSearchInterface: React.FC<GlobalSearchInterfaceProps> = ({
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [isPreviewHighlighted, setIsPreviewHighlighted] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [voiceTranscript, setVoiceTranscript] = useState('');
+  const [voiceError, setVoiceError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated, isDemoMode } = useGoogleIntegration();
@@ -170,6 +175,33 @@ export const GlobalSearchInterface: React.FC<GlobalSearchInterfaceProps> = ({
     onAction(task.text);
   };
 
+  // Voice recording handlers
+  const handleVoiceTranscript = (transcript: string) => {
+    setVoiceTranscript(transcript);
+    setQuery(transcript);
+  };
+
+  const handleVoiceStart = () => {
+    setIsRecording(true);
+    setVoiceError(null);
+    setVoiceTranscript('');
+  };
+
+  const handleVoiceStop = () => {
+    setIsRecording(false);
+    // Auto-execute if we have a transcript
+    if (voiceTranscript.trim()) {
+      setTimeout(() => {
+        onAction(voiceTranscript.trim());
+      }, 500); // Small delay to show the final transcript
+    }
+  };
+
+  const handleVoiceError = (error: string) => {
+    setVoiceError(error);
+    setIsRecording(false);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       
@@ -182,7 +214,14 @@ export const GlobalSearchInterface: React.FC<GlobalSearchInterfaceProps> = ({
                 <span className="text-white font-bold text-sm">ZB</span>
               </div>
               <div>
-                <h1 className="text-lg font-semibold text-foreground">ZenBox <span className="bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">AI</span></h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-lg font-semibold text-foreground">ZenBox <span className="bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">AI</span></h1>
+                  {openaiService.isConfigured() && (
+                    <div className="px-2 py-0.5 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 text-xs rounded-full border border-green-200 dark:border-green-800">
+                      AI Ready
+                    </div>
+                  )}
+                </div>
                 <p className="text-xs text-muted-foreground">Your AI-powered productivity companion</p>
               </div>
             </div>
@@ -270,21 +309,41 @@ export const GlobalSearchInterface: React.FC<GlobalSearchInterfaceProps> = ({
                 />
 
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <Button
-                    type="button"
-                    variant="ghost"
+                  <MicrophoneButton
+                    onTranscript={handleVoiceTranscript}
+                    onStart={handleVoiceStart}
+                    onStop={handleVoiceStop}
+                    onError={handleVoiceError}
                     size="sm"
+                    variant="ghost"
                     className="text-muted-foreground hover:text-foreground"
-                  >
-                    <Mic className="h-4 w-4" />
-                  </Button>
-                  
+                  />
+
                   <div className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded">
                     ⌘K
                   </div>
                 </div>
               </form>
             </Card>
+
+            {/* Voice Recording Indicator */}
+            <VoiceRecordingIndicator
+              isRecording={isRecording}
+              transcript={voiceTranscript}
+              className="max-w-4xl mx-auto"
+            />
+
+            {/* Voice Error Display */}
+            {voiceError && (
+              <div className="max-w-4xl mx-auto">
+                <div className="flex items-center gap-2 px-3 py-2 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg">
+                  <div className="w-2 h-2 bg-red-500 rounded-full" />
+                  <span className="text-sm text-red-600 dark:text-red-400">
+                    {voiceError}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Action Preview Generation */}

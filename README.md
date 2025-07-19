@@ -39,6 +39,27 @@ Your AI-powered productivity companion that unifies search, automation, and inte
 
 5. **Open your browser** and navigate to `http://localhost:5173`
 
+## 🤖 OpenAI Integration
+
+ZenBox AI uses OpenAI's GPT models to analyze your search queries and provide intelligent suggestions.
+
+### Setup:
+1. Get your API key from [OpenAI Platform](https://platform.openai.com/api-keys)
+2. Add to your `.env` file: `VITE_OPENAI_API_KEY=your-api-key-here`
+3. Restart the development server
+
+### Features:
+- **Smart Query Analysis**: Automatically detects if your input is valid or gibberish
+- **Task Classification**: Categorizes queries (email, calendar, search, meeting, etc.)
+- **AI Suggestions**: Provides actionable steps and execution options
+- **Confidence Scoring**: Shows how confident the AI is about understanding your request
+
+### Example Queries:
+- *"Send an email to john@example.com about the project update"*
+- *"Schedule a team meeting for tomorrow at 2 PM"*
+- *"Create a Google Meet for the quarterly review"*
+- *"Find my calendar events for this week"*
+
 ## Google API Setup
 
 For detailed instructions on setting up Google API integration, see the [Google API Setup Guide](./GOOGLE_API_SETUP.md).
