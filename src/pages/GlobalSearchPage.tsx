@@ -634,8 +634,58 @@ This meeting will help align our strategic direction and ensure we're building t
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {renderCurrentView()}
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Animated Glowing Border */}
+      <div className="fixed inset-0 pointer-events-none z-[9999]">
+        {/* Top Border */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-purple-500/20">
+          <div className="relative w-32 h-3 animate-[slide-right_3s_linear_infinite]">
+            {/* Thin edges, thick center gradient */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-40"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-1 bg-gradient-to-r from-purple-400 via-purple-300 to-blue-400 shadow-lg shadow-purple-500/60"
+                 style={{ filter: 'blur(0.5px)' }}></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-0.5 bg-white/80 shadow-sm shadow-white/50"></div>
+          </div>
+        </div>
+
+        {/* Right Border */}
+        <div className="absolute top-0 right-0 w-1 h-full bg-blue-500/20">
+          <div className="relative w-3 h-32 animate-[slide-down_3s_linear_infinite_0.75s]">
+            {/* Thin edges, thick center gradient */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500 to-transparent opacity-40"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1 h-16 bg-gradient-to-b from-blue-400 via-blue-300 to-purple-400 shadow-lg shadow-blue-500/60"
+                 style={{ filter: 'blur(0.5px)' }}></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-0.5 h-8 bg-white/80 shadow-sm shadow-white/50"></div>
+          </div>
+        </div>
+
+        {/* Bottom Border */}
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-purple-500/20">
+          <div className="relative w-32 h-3 ml-auto animate-[slide-left_3s_linear_infinite_1.5s]">
+            {/* Thin edges, thick center gradient */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-40"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-1 bg-gradient-to-r from-blue-400 via-purple-300 to-purple-400 shadow-lg shadow-purple-500/60"
+                 style={{ filter: 'blur(0.5px)' }}></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-0.5 bg-white/80 shadow-sm shadow-white/50"></div>
+          </div>
+        </div>
+
+        {/* Left Border */}
+        <div className="absolute top-0 left-0 w-1 h-full bg-blue-500/20">
+          <div className="relative w-3 h-32 mt-auto animate-[slide-up_3s_linear_infinite_2.25s]">
+            {/* Thin edges, thick center gradient */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500 to-transparent opacity-40"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1 h-16 bg-gradient-to-b from-purple-400 via-blue-300 to-blue-400 shadow-lg shadow-blue-500/60"
+                 style={{ filter: 'blur(0.5px)' }}></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-0.5 h-8 bg-white/80 shadow-sm shadow-white/50"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="relative z-10">
+        {renderCurrentView()}
+      </div>
     </div>
   );
 };

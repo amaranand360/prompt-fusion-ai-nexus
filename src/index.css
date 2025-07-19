@@ -2,6 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide scrollbars globally */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* WebKit browsers (Chrome, Safari, Edge) */
+}
+
+/* Ensure scrolling still works */
+html, body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* Hide scrollbars for specific elements that might need scrolling */
+.scroll-container,
+.overflow-auto,
+.overflow-y-auto,
+.overflow-x-auto,
+.overflow-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scroll-container::-webkit-scrollbar,
+.overflow-auto::-webkit-scrollbar,
+.overflow-y-auto::-webkit-scrollbar,
+.overflow-x-auto::-webkit-scrollbar,
+.overflow-scroll::-webkit-scrollbar {
+  display: none;
+}
+
 
 /* ZenBox AI Design System
    Professional-grade colors, typography, and components for modern AI-powered workspaces
@@ -212,4 +246,123 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Animated Border Light Effects */
+@keyframes slide-right {
+  0% {
+    transform: translateX(-150px);
+    opacity: 0;
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(calc(100vw + 150px));
+    opacity: 0;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+  }
+}
+
+@keyframes slide-down {
+  0% {
+    transform: translateY(-150px);
+    opacity: 0;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(100vh + 150px));
+    opacity: 0;
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
+  }
+}
+
+@keyframes slide-left {
+  0% {
+    transform: translateX(150px);
+    opacity: 0;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(calc(-100vw - 150px));
+    opacity: 0;
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
+  }
+}
+
+@keyframes slide-up {
+  0% {
+    transform: translateY(150px);
+    opacity: 0;
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(-100vh - 150px));
+    opacity: 0;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+  }
+}
+
+/* Additional scrollbar hiding for common UI components */
+.radix-scroll-area-viewport,
+.radix-scroll-area-scrollbar,
+[data-radix-scroll-area-viewport],
+.scroll-area,
+.scrollable,
+.custom-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.radix-scroll-area-viewport::-webkit-scrollbar,
+.radix-scroll-area-scrollbar::-webkit-scrollbar,
+[data-radix-scroll-area-viewport]::-webkit-scrollbar,
+.scroll-area::-webkit-scrollbar,
+.scrollable::-webkit-scrollbar,
+.custom-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbars in modals, dialogs, and dropdowns */
+.modal,
+.dialog,
+.dropdown,
+.popover,
+.tooltip,
+.sheet,
+.drawer {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.modal::-webkit-scrollbar,
+.dialog::-webkit-scrollbar,
+.dropdown::-webkit-scrollbar,
+.popover::-webkit-scrollbar,
+.tooltip::-webkit-scrollbar,
+.sheet::-webkit-scrollbar,
+.drawer::-webkit-scrollbar {
+  display: none;
 }
