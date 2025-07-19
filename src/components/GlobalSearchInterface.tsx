@@ -90,7 +90,10 @@ interface GlobalSearchInterfaceProps {
   onAction: (action: string) => void;
   previewData?: any;
   onPreviewProceed?: (data: any) => void;
+  onPreviewProceedDirect?: (data: any) => void;
   onPreviewCancel?: () => void;
+  isGeneratingPreview?: boolean;
+  showPreview?: boolean;
 }
 
 export const GlobalSearchInterface: React.FC<GlobalSearchInterfaceProps> = ({
@@ -98,7 +101,10 @@ export const GlobalSearchInterface: React.FC<GlobalSearchInterfaceProps> = ({
   onAction,
   previewData,
   onPreviewProceed,
-  onPreviewCancel
+  onPreviewProceedDirect,
+  onPreviewCancel,
+  isGeneratingPreview = false,
+  showPreview = false
 }) => {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -166,6 +172,7 @@ export const GlobalSearchInterface: React.FC<GlobalSearchInterfaceProps> = ({
 
   return (
     <div className="min-h-screen bg-background">
+      
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4">
@@ -280,11 +287,43 @@ export const GlobalSearchInterface: React.FC<GlobalSearchInterfaceProps> = ({
             </Card>
           </div>
 
-          {/* Action Preview */}
-          {previewData && onPreviewProceed && onPreviewCancel && (
+          {/* Action Preview Generation */}
+          {isGeneratingPreview && (
             <div
               ref={previewRef}
+              className="space-y-4 animate-pulse"
+            >
+              <div className="bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg p-6 border-2 border-dashed border-purple-300 dark:border-purple-700">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full animate-spin flex items-center justify-center">
+                    <div className="w-4 h-4 bg-white rounded-full"></div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gradient-to-r from-purple-300 to-blue-300 rounded w-32 animate-pulse"></div>
+                    <div className="h-3 bg-gray-300 rounded w-48 animate-pulse"></div>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="h-3 bg-gray-200 rounded w-full animate-pulse"></div>
+                  <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                </div>
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">
+                    🤖 AI is generating your action preview...
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Action Preview */}
+          {previewData && onPreviewProceed && onPreviewProceedDirect && onPreviewCancel && (
+            <div
+              ref={!isGeneratingPreview ? previewRef : undefined}
               className={`space-y-4 transition-all duration-1000 ${
+                showPreview ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+              } ${
                 isPreviewHighlighted
                   ? 'ring-4 ring-[hsl(var(--brand-primary))]/30 ring-offset-4 ring-offset-background rounded-lg'
                   : ''
@@ -293,7 +332,9 @@ export const GlobalSearchInterface: React.FC<GlobalSearchInterfaceProps> = ({
               <ActionPreview
                 previewData={previewData}
                 onProceed={onPreviewProceed}
+                onProceedDirect={onPreviewProceedDirect}
                 onCancel={onPreviewCancel}
+                showContent={showPreview}
               />
             </div>
           )}

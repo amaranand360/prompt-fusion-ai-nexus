@@ -26,6 +26,8 @@ export const GlobalSearchPage: React.FC = () => {
   const [previewData, setPreviewData] = useState<ActionPreviewData | null>(null);
   const [isExecutingAction, setIsExecutingAction] = useState(false);
   const [currentExecutionResult, setCurrentExecutionResult] = useState<string | null>(null);
+  const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   // Check backend availability on component mount
   useEffect(() => {
@@ -50,27 +52,149 @@ export const GlobalSearchPage: React.FC = () => {
     checkBackend();
   }, []);
 
-  // Helper function to generate preview data from action
+  // Helper function to execute demo actions (when backend is not available)
+  const executeDemoAction = async (action: string, actionId: string, actionData: ActionPreviewData) => {
+    try {
+      console.log('🎭 Executing demo action:', action);
+      setIsExecutingAction(true);
+      updateActionResult(actionId, 'executing');
+
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 2000));
+
+      // Generate demo success response based on action type
+      let demoResult = '';
+      if (actionData.type === 'email') {
+        demoResult = `✅ Email sent successfully to ${actionData.data.recipients?.join(', ')}!\n\n📧 Subject: ${actionData.data.subject}\n📝 Message delivered to ${actionData.data.recipients?.length || 0} recipient(s)`;
+      } else if (actionData.type === 'calendar' || actionData.type === 'meeting') {
+        const meetLink = actionData.data.includeMeet ? '\n🔗 Google Meet: https://meet.google.com/demo-link-123' : '';
+        demoResult = `✅ ${actionData.data.includeMeet ? 'Meeting' : 'Calendar event'} created successfully!\n\n📅 ${actionData.data.title}\n🕐 ${actionData.data.date} at ${actionData.data.time}\n⏱️ Duration: ${actionData.data.duration} minutes\n👥 Attendees: ${actionData.data.attendees?.join(', ')}${meetLink}`;
+      } else {
+        demoResult = `✅ Action "${action}" completed successfully!\n\n🎯 Demo mode: This action was simulated for demonstration purposes.`;
+      }
+
+      setCurrentExecutionResult(demoResult);
+      updateActionResult(actionId, 'completed', demoResult);
+      setIsExecutingAction(false);
+    } catch (error) {
+      console.error('Demo action error:', error);
+      setCurrentExecutionResult('Demo action failed');
+      updateActionResult(actionId, 'failed', 'Demo action failed');
+      setIsExecutingAction(false);
+    }
+  };
+
+  // Helper function to generate preview data from action with rich demo data
   const generatePreviewData = (action: string): ActionPreviewData => {
     const actionLower = action.toLowerCase();
 
     if (actionLower.includes('email') || actionLower.includes('send') || actionLower.includes('compose')) {
+      // Generate rich demo data based on action context
+      let recipients: string[] = [];
+      let subject: string = '';
+      let body: string = '';
+
+      if (actionLower.includes('project update')) {
+        recipients = ['team@company.com', 'manager@company.com', 'stakeholders@company.com'];
+        subject = 'Weekly Project Update - ZenBox AI Development';
+        body = `Hi Team,
+
+I hope this email finds you well. I wanted to provide you with a comprehensive update on our ZenBox AI project progress.
+
+📊 **This Week's Achievements:**
+• Completed the Global Search interface with action previews
+• Integrated real-time Google API connections (Gmail, Calendar, Meet)
+• Implemented auto-scroll and highlight functionality
+• Added comprehensive error handling and fallback mechanisms
+
+🎯 **Key Metrics:**
+• 95% of planned features completed
+• Zero critical bugs in production
+• User engagement increased by 40%
+
+🚀 **Next Week's Goals:**
+• Finalize landing page with Spline 3D integration
+• Complete comprehensive testing suite
+• Prepare for beta release
+
+Please let me know if you have any questions or concerns.
+
+Best regards,
+ZenBox AI Team`;
+      } else if (actionLower.includes('follow-up')) {
+        recipients = ['client@example.com'];
+        subject = 'Follow-up: ZenBox AI Demo Session';
+        body = `Hi [Client Name],
+
+Thank you for taking the time to review our ZenBox AI demo yesterday. I wanted to follow up on our discussion and address any questions you might have.
+
+🔍 **Key Points Discussed:**
+• AI-powered productivity automation
+• Google Workspace integration capabilities
+• Custom workflow creation
+• Enterprise security features
+
+📋 **Next Steps:**
+• Schedule a technical deep-dive session
+• Provide custom demo with your use cases
+• Discuss implementation timeline
+
+I'm available for a call this week to discuss how ZenBox AI can specifically benefit your organization.
+
+Looking forward to hearing from you!
+
+Best regards,
+[Your Name]`;
+      } else if (actionLower.includes('thank')) {
+        recipients = ['team@company.com'];
+        subject = 'Thank You - Outstanding Work on ZenBox AI!';
+        body = `Dear Team,
+
+I wanted to take a moment to express my sincere gratitude for your exceptional work on the ZenBox AI project.
+
+🌟 **Your Amazing Contributions:**
+• Innovative problem-solving and creative solutions
+• Dedication to quality and attention to detail
+• Collaborative spirit and team support
+• Going above and beyond project expectations
+
+The success of our AI-powered productivity platform is a direct result of your hard work, expertise, and commitment to excellence.
+
+🎉 **Celebrating Our Success:**
+• Successfully launched all core features
+• Exceeded performance benchmarks
+• Received outstanding user feedback
+• Built a truly revolutionary product
+
+Thank you for making ZenBox AI a reality. I'm proud to work with such a talented and dedicated team!
+
+With appreciation,
+[Your Name]`;
+      } else {
+        recipients = ['recipient@example.com'];
+        subject = 'Important Update from ZenBox AI';
+        body = `Hi there,
+
+I hope this email finds you well. I wanted to reach out regarding our ZenBox AI platform.
+
+Our AI-powered productivity companion is designed to streamline your workflow and boost efficiency across all your favorite tools.
+
+Key features include:
+• Unified search across 50+ tools
+• Intelligent action automation
+• Real-time Google Workspace integration
+• Smart task management
+
+Would you be interested in learning more about how ZenBox AI can transform your productivity?
+
+Best regards,
+ZenBox AI Team`;
+      }
+
       return {
         type: 'email',
         action,
-        data: {
-          recipients: [''],
-          subject: actionLower.includes('project update') ? 'Project Update Summary' :
-                   actionLower.includes('follow-up') ? 'Follow-up on Previous Discussion' :
-                   actionLower.includes('thank') ? 'Thank You' : 'New Message',
-          body: actionLower.includes('project update') ?
-                'Hi team,\n\nI wanted to provide you with an update on our current project status...' :
-                actionLower.includes('follow-up') ?
-                'Hi,\n\nI wanted to follow up on our previous discussion...' :
-                actionLower.includes('thank') ?
-                'Hi team,\n\nI wanted to thank you for your excellent work on...' :
-                'Hi,\n\nI hope this email finds you well...'
-        }
+        data: { recipients, subject, body }
       };
     }
 
@@ -79,24 +203,140 @@ export const GlobalSearchPage: React.FC = () => {
       const today = new Date();
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
+      const nextWeek = new Date(today);
+      nextWeek.setDate(today.getDate() + 7);
+
+      // Generate rich demo data based on meeting type
+      let title: string = '';
+      let attendees: string[] = [];
+      let location: string = '';
+      let description: string = '';
+      let duration: number = 60;
+      let time: string = '14:00';
+      let date: string = tomorrow.toISOString().split('T')[0];
+
+      if (actionLower.includes('standup')) {
+        title = 'Daily Team Standup - ZenBox AI';
+        attendees = ['dev-team@company.com', 'product@company.com', 'design@company.com'];
+        location = isMeetAction ? 'Google Meet (Auto-generated)' : 'Conference Room A';
+        time = '09:00';
+        duration = 30;
+        description = `Daily standup meeting for ZenBox AI development team.
+
+📋 **Agenda:**
+• What did you accomplish yesterday?
+• What will you work on today?
+• Are there any blockers or impediments?
+
+🎯 **Current Sprint Goals:**
+• Complete action preview functionality
+• Integrate Google API connections
+• Finalize landing page design
+• Prepare for beta testing
+
+⏰ **Meeting Guidelines:**
+• Keep updates brief and focused
+• Raise blockers for team discussion
+• Follow up on action items from previous standup
+
+Join us to sync up on progress and plan the day ahead!`;
+      } else if (actionLower.includes('client')) {
+        title = 'ZenBox AI - Client Presentation & Demo';
+        attendees = ['client@example.com', 'sales@company.com', 'product@company.com'];
+        location = isMeetAction ? 'Google Meet (Auto-generated)' : 'Executive Conference Room';
+        time = '15:00';
+        duration = 90;
+        date = nextWeek.toISOString().split('T')[0];
+        description = `Comprehensive presentation and live demonstration of ZenBox AI platform for prospective client.
+
+🎯 **Presentation Outline:**
+• Company introduction and vision
+• ZenBox AI platform overview
+• Live demo of key features
+• Integration capabilities showcase
+• Pricing and implementation timeline
+
+💡 **Demo Highlights:**
+• Global search across 50+ tools
+• AI-powered action automation
+• Real-time Google Workspace integration
+• Custom workflow creation
+• Enterprise security features
+
+📊 **Expected Outcomes:**
+• Client understanding of platform value
+• Technical requirements discussion
+• Next steps and timeline planning
+• Potential partnership opportunities
+
+Please come prepared with questions and use cases specific to the client's needs.`;
+      } else if (actionLower.includes('team')) {
+        title = 'Weekly Team Meeting - ZenBox AI Project';
+        attendees = ['engineering@company.com', 'product@company.com', 'design@company.com', 'qa@company.com'];
+        location = isMeetAction ? 'Google Meet (Auto-generated)' : 'Main Conference Room';
+        time = '14:00';
+        duration = 60;
+        description = `Weekly team meeting to review progress, discuss challenges, and plan upcoming work.
+
+📈 **This Week's Review:**
+• Sprint progress and completed features
+• Performance metrics and user feedback
+• Technical challenges and solutions
+• Quality assurance updates
+
+🎯 **Planning & Discussion:**
+• Next sprint planning and priorities
+• Resource allocation and timeline
+• Cross-team collaboration opportunities
+• Risk assessment and mitigation
+
+🚀 **Upcoming Milestones:**
+• Beta release preparation
+• User testing coordination
+• Documentation updates
+• Marketing material preparation
+
+Come prepared to share updates from your area and discuss any blockers or support needed.`;
+      } else {
+        title = 'ZenBox AI Strategy Meeting';
+        attendees = ['leadership@company.com', 'product@company.com'];
+        location = isMeetAction ? 'Google Meet (Auto-generated)' : 'Executive Boardroom';
+        time = '16:00';
+        duration = 90;
+        description = `Strategic planning meeting to discuss ZenBox AI roadmap and business objectives.
+
+🎯 **Key Discussion Points:**
+• Product roadmap and feature prioritization
+• Market positioning and competitive analysis
+• User acquisition and retention strategies
+• Technical architecture and scalability
+
+📊 **Business Metrics Review:**
+• User engagement and adoption rates
+• Performance benchmarks and KPIs
+• Revenue projections and growth targets
+• Customer feedback and satisfaction scores
+
+🚀 **Strategic Initiatives:**
+• Partnership opportunities
+• Integration ecosystem expansion
+• AI capabilities enhancement
+• Enterprise market penetration
+
+This meeting will help align our strategic direction and ensure we're building the right product for our target market.`;
+      }
 
       return {
         type: isMeetAction ? 'meeting' : 'calendar',
         action,
         data: {
-          title: actionLower.includes('standup') ? 'Team Standup' :
-                 actionLower.includes('client') ? 'Client Presentation' :
-                 actionLower.includes('team') ? 'Team Meeting' : 'New Meeting',
-          date: tomorrow.toISOString().split('T')[0],
-          time: actionLower.includes('standup') ? '09:00' : '14:00',
-          duration: actionLower.includes('standup') ? 30 : 60,
-          attendees: [''],
-          location: isMeetAction ? 'Google Meet' : '',
-          description: actionLower.includes('standup') ?
-                      'Daily team standup to discuss progress and blockers' :
-                      actionLower.includes('client') ?
-                      'Presentation of project progress to client' :
-                      'Team meeting to discuss upcoming tasks',
+          title,
+          date,
+          time,
+          duration,
+          attendees,
+          location,
+          description,
           includeMeet: isMeetAction
         }
       };
@@ -221,24 +461,48 @@ export const GlobalSearchPage: React.FC = () => {
     console.log('🎯 Action clicked:', action);
     setCurrentAction(action);
 
+    // Start the preview generation animation
+    setIsGeneratingPreview(true);
+    setShowPreview(false);
+    setPreviewData(null);
+
+    // Simulate AI thinking/generation delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+
     // Generate preview data for the action
     const preview = generatePreviewData(action);
     console.log('📋 Generated preview data:', preview);
+
+    // Set preview data and start fade-in animation
     setPreviewData(preview);
-    // Stay on home view but show preview inline
+    setIsGeneratingPreview(false);
+
+    // Small delay then show preview with fade-in
+    setTimeout(() => {
+      setShowPreview(true);
+    }, 100);
   };
 
   const handlePreviewProceed = async (updatedPreviewData: ActionPreviewData) => {
-    console.log('✅ Proceeding with action:', updatedPreviewData);
+    console.log('✅ Proceeding with action (with editing):', updatedPreviewData);
+    executeActionWithData(updatedPreviewData);
+  };
+
+  const handlePreviewProceedDirect = async (previewData: ActionPreviewData) => {
+    console.log('⚡ Proceeding directly with action:', previewData);
+    executeActionWithData(previewData);
+  };
+
+  const executeActionWithData = async (actionData: ActionPreviewData) => {
     setPreviewData(null); // Clear preview
     setCurrentView('action');
 
     // Add action to results
     const newAction: ActionResult = {
       id: Date.now().toString(),
-      action: updatedPreviewData.action,
+      action: actionData.action,
       status: 'pending',
-      description: `Executing: ${updatedPreviewData.action}`,
+      description: `Executing: ${actionData.action}`,
       timestamp: new Date().toLocaleTimeString()
     };
 
@@ -247,22 +511,29 @@ export const GlobalSearchPage: React.FC = () => {
     // If backend is available, execute real action
     if (isBackendAvailable) {
       try {
-        await executeRealAction(updatedPreviewData.action, newAction.id, updatedPreviewData);
+        await executeRealAction(actionData.action, newAction.id, actionData);
       } catch (error) {
         console.error('Failed to execute real action:', error);
         // Fall back to demo mode for this action
         updateActionResult(newAction.id, 'failed', `Failed to execute: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
+    } else {
+      // Demo mode - simulate API call
+      await executeDemoAction(actionData.action, newAction.id, actionData);
     }
   };
 
   const handlePreviewCancel = () => {
     console.log('❌ Action preview cancelled');
     setPreviewData(null);
+    setShowPreview(false);
+    setIsGeneratingPreview(false);
     // Stay on current view, just hide preview
   };
 
   const handleActionComplete = () => {
+    console.log('🏠 Action completed, returning to home');
+
     // Update the action status to completed
     setActionResults(prev =>
       prev.map(action =>
@@ -270,36 +541,34 @@ export const GlobalSearchPage: React.FC = () => {
           ? {
               ...action,
               status: 'completed' as const,
-              result: getActionResult(currentAction),
+              result: currentExecutionResult || getActionResult(currentAction),
               timestamp: new Date().toLocaleTimeString()
             }
           : action
       )
     );
 
-    // Return to search results if we have a query, otherwise go to home
-    if (searchQuery) {
-      setCurrentView('results');
-    } else {
-      setCurrentView('home');
-    }
+    // Clean up state and return to home
+    setCurrentView('home');
+    setPreviewData(null);
+    setCurrentAction('');
+    setCurrentExecutionResult(null);
+    setIsExecutingAction(false);
   };
 
   const handleActionRetry = () => {
-    // Update the action status to pending and retry
-    setActionResults(prev => 
-      prev.map(action => 
-        action.action === currentAction 
-          ? { 
-              ...action, 
-              status: 'pending' as const,
-              timestamp: new Date().toLocaleTimeString()
-            }
-          : action
-      )
-    );
-    
-    setCurrentView('action');
+    console.log('🔄 Retrying action, returning to home for new attempt');
+
+    // Clean up state and return to home for retry
+    setCurrentView('home');
+    setPreviewData(null);
+    setCurrentAction('');
+    setCurrentExecutionResult(null);
+    setIsExecutingAction(false);
+
+    // Optionally, you could regenerate the preview for the same action
+    // const preview = generatePreviewData(currentAction);
+    // setPreviewData(preview);
   };
 
   const getActionResult = (action: string): string => {
@@ -324,7 +593,10 @@ export const GlobalSearchPage: React.FC = () => {
             onAction={handleAction}
             previewData={previewData}
             onPreviewProceed={handlePreviewProceed}
+            onPreviewProceedDirect={handlePreviewProceedDirect}
             onPreviewCancel={handlePreviewCancel}
+            isGeneratingPreview={isGeneratingPreview}
+            showPreview={showPreview}
           />
         );
       case 'results':
@@ -352,7 +624,10 @@ export const GlobalSearchPage: React.FC = () => {
             onAction={handleAction}
             previewData={previewData}
             onPreviewProceed={handlePreviewProceed}
+            onPreviewProceedDirect={handlePreviewProceedDirect}
             onPreviewCancel={handlePreviewCancel}
+            isGeneratingPreview={isGeneratingPreview}
+            showPreview={showPreview}
           />
         );
     }

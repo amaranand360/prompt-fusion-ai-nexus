@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGoogleIntegration, useGoogleServices } from '@/contexts/GoogleIntegrationContext';
+import { EnhancedToolConnectionManager } from '@/components/EnhancedToolConnectionManager';
 import {
   Mail,
   Calendar,
@@ -263,12 +264,17 @@ export const IntegrationDashboard: React.FC = () => {
       )}
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="services" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="services">Services</TabsTrigger>
+      <Tabs defaultValue="all-tools" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="all-tools">All Tools</TabsTrigger>
+          <TabsTrigger value="services">Google Services</TabsTrigger>
           <TabsTrigger value="activity">Recent Activity</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="all-tools" className="space-y-6">
+          <EnhancedToolConnectionManager />
+        </TabsContent>
 
         <TabsContent value="services" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

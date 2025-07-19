@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { useMultiFieldTyping } from '@/hooks/useTypingAnimation';
+import { TypingCursor } from '@/components/TypingCursor';
 import {
   Mail,
   Calendar,
@@ -16,7 +18,8 @@ import {
   X,
   Edit3,
   CheckCircle,
-  ArrowRight
+  ArrowRight,
+  Zap
 } from 'lucide-react';
 
 export interface ActionPreviewData {
@@ -43,18 +46,59 @@ export interface ActionPreviewData {
 interface ActionPreviewProps {
   previewData: ActionPreviewData;
   onProceed: (updatedData: ActionPreviewData) => void;
+  onProceedDirect: (data: ActionPreviewData) => void;
   onCancel: () => void;
   className?: string;
+  showContent?: boolean;
 }
 
 export const ActionPreview: React.FC<ActionPreviewProps> = ({
   previewData,
   onProceed,
+  onProceedDirect,
   onCancel,
-  className = ''
+  className = '',
+  showContent = true
 }) => {
   const [formData, setFormData] = useState(previewData.data);
   const [isEditing, setIsEditing] = useState(false);
+
+  // Prepare fields for typing animation
+  const typingFields = React.useMemo(() => {
+    const fields: Record<string, string> = {};
+
+    if (previewData.type === 'email') {
+      if (previewData.data.recipients?.length) {
+        fields.recipients = previewData.data.recipients.join(', ');
+      }
+      if (previewData.data.subject) {
+        fields.subject = previewData.data.subject;
+      }
+      if (previewData.data.body) {
+        fields.body = previewData.data.body;
+      }
+    } else if (previewData.type === 'calendar' || previewData.type === 'meeting') {
+      if (previewData.data.title) {
+        fields.title = previewData.data.title;
+      }
+      if (previewData.data.attendees?.length) {
+        fields.attendees = previewData.data.attendees.join(', ');
+      }
+      if (previewData.data.description) {
+        fields.description = previewData.data.description;
+      }
+    }
+
+    return fields;
+  }, [previewData]);
+
+  // Use typing animation hook
+  const { animatedFields, currentField, isComplete } = useMultiFieldTyping({
+    fields: typingFields,
+    speed: 20,
+    fieldDelay: 300,
+    enabled: showContent && !isEditing
+  });
 
   useEffect(() => {
     setFormData(previewData.data);
@@ -121,13 +165,15 @@ export const ActionPreview: React.FC<ActionPreviewProps> = ({
         <Label htmlFor="recipients" className="flex items-center gap-2">
           <Users className="h-4 w-4" />
           Recipients
+          {currentField === 'recipients' && <TypingCursor show={true} />}
         </Label>
         <Input
           id="recipients"
-          value={formData.recipients?.join(', ') || ''}
+          value={isEditing ? (formData.recipients?.join(', ') || '') : (animatedFields.recipients || '')}
           onChange={(e) => handleInputChange('recipients', e.target.value.split(',').map(r => r.trim()))}
           placeholder="Enter email addresses separated by commas"
           disabled={!isEditing}
+          className={currentField === 'recipients' ? 'border-blue-300 bg-blue-50/50' : ''}
         />
       </div>
 
@@ -135,13 +181,15 @@ export const ActionPreview: React.FC<ActionPreviewProps> = ({
         <Label htmlFor="subject" className="flex items-center gap-2">
           <Edit3 className="h-4 w-4" />
           Subject
+          {currentField === 'subject' && <TypingCursor show={true} />}
         </Label>
         <Input
           id="subject"
-          value={formData.subject || ''}
+          value={isEditing ? (formData.subject || '') : (animatedFields.subject || '')}
           onChange={(e) => handleInputChange('subject', e.target.value)}
           placeholder="Email subject"
           disabled={!isEditing}
+          className={currentField === 'subject' ? 'border-blue-300 bg-blue-50/50' : ''}
         />
       </div>
 
@@ -149,15 +197,16 @@ export const ActionPreview: React.FC<ActionPreviewProps> = ({
         <Label htmlFor="body" className="flex items-center gap-2">
           <Mail className="h-4 w-4" />
           Message
+          {currentField === 'body' && <TypingCursor show={true} />}
         </Label>
         <Textarea
           id="body"
-          value={formData.body || ''}
+          value={isEditing ? (formData.body || '') : (animatedFields.body || '')}
           onChange={(e) => handleInputChange('body', e.target.value)}
           placeholder="Email content"
-          rows={4}
+          rows={6}
           disabled={!isEditing}
-          className="resize-none"
+          className={`resize-none ${currentField === 'body' ? 'border-blue-300 bg-blue-50/50' : ''}`}
         />
       </div>
     </div>
@@ -166,13 +215,18 @@ export const ActionPreview: React.FC<ActionPreviewProps> = ({
   const renderCalendarPreview = () => (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="title">Event Title</Label>
+        <Label htmlFor="title" className="flex items-center gap-2">
+          <Calendar className="h-4 w-4" />
+          Event Title
+          {currentField === 'title' && <TypingCursor show={true} />}
+        </Label>
         <Input
           id="title"
-          value={formData.title || ''}
+          value={isEditing ? (formData.title || '') : (animatedFields.title || '')}
           onChange={(e) => handleInputChange('title', e.target.value)}
           placeholder="Meeting title"
           disabled={!isEditing}
+          className={currentField === 'title' ? 'border-blue-300 bg-blue-50/50' : ''}
         />
       </div>
       
@@ -237,13 +291,15 @@ export const ActionPreview: React.FC<ActionPreviewProps> = ({
         <Label htmlFor="attendees" className="flex items-center gap-2">
           <Users className="h-4 w-4" />
           Attendees
+          {currentField === 'attendees' && <TypingCursor show={true} />}
         </Label>
         <Input
           id="attendees"
-          value={formData.attendees?.join(', ') || ''}
+          value={isEditing ? (formData.attendees?.join(', ') || '') : (animatedFields.attendees || '')}
           onChange={(e) => handleInputChange('attendees', e.target.value.split(',').map(a => a.trim()))}
           placeholder="Enter email addresses separated by commas"
           disabled={!isEditing}
+          className={currentField === 'attendees' ? 'border-blue-300 bg-blue-50/50' : ''}
         />
       </div>
       
@@ -262,14 +318,19 @@ export const ActionPreview: React.FC<ActionPreviewProps> = ({
       )}
       
       <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description" className="flex items-center gap-2">
+          <Edit3 className="h-4 w-4" />
+          Description
+          {currentField === 'description' && <TypingCursor show={true} />}
+        </Label>
         <Textarea
           id="description"
-          value={formData.description || ''}
+          value={isEditing ? (formData.description || '') : (animatedFields.description || '')}
           onChange={(e) => handleInputChange('description', e.target.value)}
           placeholder="Meeting description"
-          rows={3}
+          rows={4}
           disabled={!isEditing}
+          className={`resize-none ${currentField === 'description' ? 'border-blue-300 bg-blue-50/50' : ''}`}
         />
       </div>
     </div>
@@ -332,13 +393,13 @@ export const ActionPreview: React.FC<ActionPreviewProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between pt-6 border-t bg-secondary/20 -mx-6 px-6 py-4 rounded-b-lg">
+        <div className="flex flex-col gap-4 pt-6 border-t bg-secondary/20 -mx-6 px-6 py-4 rounded-b-lg">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <CheckCircle className="h-4 w-4" />
             {validateForm() ? 'Ready to execute with real APIs' : 'Please fill required fields'}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between">
             <Button
               variant="outline"
               onClick={onCancel}
@@ -348,16 +409,28 @@ export const ActionPreview: React.FC<ActionPreviewProps> = ({
               Cancel
             </Button>
 
-            <Button
-              onClick={handleProceed}
-              className="flex items-center gap-2 bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-secondary))] hover:opacity-90 shadow-lg"
-              size="lg"
-              disabled={!validateForm()}
-            >
-              <Send className="h-4 w-4" />
-              Proceed to Execute
-              <ArrowRight className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                onClick={() => onProceedDirect(previewData)}
+                className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700 hover:text-blue-800"
+                disabled={!validateForm()}
+              >
+                <Zap className="h-4 w-4" />
+                Proceed Directly
+              </Button>
+
+              <Button
+                onClick={handleProceed}
+                className="flex items-center gap-2 bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-secondary))] hover:opacity-90 shadow-lg"
+                size="lg"
+                disabled={!validateForm()}
+              >
+                <Edit3 className="h-4 w-4" />
+                Proceed with Editing
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
