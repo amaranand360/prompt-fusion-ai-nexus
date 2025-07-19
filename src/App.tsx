@@ -14,7 +14,7 @@ import Analytics from "./pages/Analytics";
 import AdminDashboard from "./pages/AdminDashboard";
 import Integrations from "./pages/Integrations";
 import NotFound from "./pages/NotFound";
-import { LandingPage } from "./pages/LandingPage";
+import Home from "./pages/LandingPage";
 import { GlobalSearchPage } from "./pages/GlobalSearchPage";
 import { ToolsPage } from "./pages/ToolsPage";
 import { TalkPage } from "./pages/TalkPage";
@@ -40,7 +40,7 @@ const AppContent = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<Home />} />
       <Route path="/search" element={<GlobalSearchPage />} />
       <Route path="/tools" element={<ToolsPage />} />
 
