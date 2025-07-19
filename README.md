@@ -1,73 +1,226 @@
-# Welcome to your Lovable project
+# ZenBox AI
 
-## Project info
+Your AI-powered productivity companion that unifies search, automation, and intelligence across all your favorite tools and platforms.
 
-**URL**: https://lovable.dev/projects/12fb13ed-d3e6-450d-baea-206f02c97b95
+## Features
 
-## How can I edit this code?
+- 🔍 **Intelligent Search Interface** - Natural language search with AI-powered actions
+- 📧 **Gmail Integration** - Send emails, search messages, and manage your inbox
+- 📅 **Google Calendar** - Schedule meetings, manage events, and view your calendar
+- 🎥 **Google Meet** - Create instant meetings and manage video calls
+- 🤖 **AI Assistant** - Process natural language commands and automate workflows
+- 🎨 **Modern UI** - Beautiful, responsive interface with dark/light mode
+- 🔔 **Real-time Notifications** - Stay updated with action results and status changes
+- 📊 **Analytics Dashboard** - Monitor usage and performance metrics
 
-There are several ways of editing your application.
+## Quick Start
 
-**Use Lovable**
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd zenbox-ai
+   ```
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/12fb13ed-d3e6-450d-baea-206f02c97b95) and start prompting.
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-Changes made via Lovable will be committed automatically to this repo.
+3. **Set up Google API credentials** (see [Google API Setup Guide](./GOOGLE_API_SETUP.md))
+   ```bash
+   cp .env.example .env
+   # Edit .env with your Google API credentials
+   ```
 
-**Use your preferred IDE**
+4. **Start the development server**
+   ```bash
+   npm run dev
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+5. **Open your browser** and navigate to `http://localhost:5173`
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Google API Setup
 
-Follow these steps:
+For detailed instructions on setting up Google API integration, see the [Google API Setup Guide](./GOOGLE_API_SETUP.md).
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Quick Setup Summary:
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+1. Create a Google Cloud Project
+2. Enable Gmail, Calendar, and Drive APIs
+3. Configure OAuth consent screen
+4. Create OAuth 2.0 credentials
+5. Add credentials to your `.env` file
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Usage Examples
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### Natural Language Commands
+
+The AI assistant can understand and execute various commands:
+
+**Email Actions:**
+- "Send an email to john@example.com with subject 'Meeting Tomorrow'"
+- "Search for emails from my manager"
+- "Reply to the latest email from the team"
+
+**Calendar Actions:**
+- "Schedule a meeting tomorrow at 2 PM"
+- "Create a team standup for next Monday"
+- "Show my meetings for today"
+
+**Google Meet Actions:**
+- "Create an instant meeting"
+- "Schedule a Google Meet for the presentation"
+- "Create a video call with the team"
+
+**Search Actions:**
+- "Find all emails about the project"
+- "Search my calendar for meetings with John"
+- "Show me everything related to the quarterly review"
+
+## Architecture
+
+### Frontend
+- **React 18** with TypeScript
+- **Tailwind CSS** for styling
+- **shadcn/ui** for UI components
+- **React Router** for navigation
+- **React Query** for data fetching
+
+### Google Integration
+- **Google APIs Client Library** for authentication
+- **Gmail API** for email management
+- **Google Calendar API** for calendar operations
+- **Google Meet** integration via Calendar API
+
+### State Management
+- **React Context** for global state
+- **Custom hooks** for Google services
+- **Notification system** for real-time updates
+
+## Project Structure
+
+```
+src/
+├── components/           # Reusable UI components
+│   ├── ui/              # shadcn/ui components
+│   ├── SearchInterface.tsx
+│   ├── IntegrationDashboard.tsx
+│   └── NotificationCenter.tsx
+├── contexts/            # React contexts
+│   ├── GoogleIntegrationContext.tsx
+│   ├── NotificationContext.tsx
+│   └── ThemeContext.tsx
+├── services/            # API services
+│   └── google/          # Google API integrations
+│       ├── auth.ts
+│       ├── gmail.ts
+│       ├── calendar.ts
+│       ├── meet.ts
+│       └── index.ts
+├── pages/               # Page components
+├── hooks/               # Custom hooks
+└── lib/                 # Utilities
 ```
 
-**Edit a file directly in GitHub**
+## Environment Variables
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Create a `.env` file with the following variables:
 
-**Use GitHub Codespaces**
+```env
+# Google API Configuration
+VITE_GOOGLE_CLIENT_ID=your_google_client_id
+VITE_GOOGLE_CLIENT_SECRET=your_google_client_secret
+VITE_GOOGLE_REDIRECT_URI=http://localhost:5173/auth/google/callback
+VITE_GOOGLE_PROJECT_ID=your_google_project_id
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Development
 
-## What technologies are used for this project?
+### Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+- `npm run type-check` - Run TypeScript checks
+
+### Adding New Integrations
+
+1. Create a new service in `src/services/`
+2. Add authentication logic
+3. Create API methods
+4. Update the integration context
+5. Add UI components
+6. Update the dashboard
+
+## Deployment
+
+### Production Build
+
+```bash
+npm run build
+```
+
+### Environment Setup
+
+1. Update environment variables for production
+2. Configure OAuth redirect URIs for your domain
+3. Submit app for Google verification (if needed)
+4. Deploy to your hosting platform
+
+### Hosting Platforms
+
+This app can be deployed to:
+- **Vercel** (recommended)
+- **Netlify**
+- **AWS Amplify**
+- **Google Cloud Platform**
+
+## Security
+
+- OAuth 2.0 for secure authentication
+- Environment variables for sensitive data
+- HTTPS required in production
+- Token refresh handling
+- Scope-based permissions
+
+## Troubleshooting
+
+### Common Issues
+
+**"This app isn't verified" warning**
+- Normal during development
+- Click "Advanced" → "Go to [App Name] (unsafe)"
+- Submit for verification in production
+
+**Authentication errors**
+- Check client ID and secret
+- Verify redirect URI matches exactly
+- Ensure APIs are enabled
+
+**API quota exceeded**
+- Monitor usage in Google Cloud Console
+- Implement rate limiting
+- Consider upgrading quotas
+
+**Token expiration**
+- Tokens are automatically refreshed
+- Re-authenticate if refresh fails
+- Check token storage
+
+## Technologies Used
 
 This project is built with:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **Vite** - Fast build tool and dev server
+- **TypeScript** - Type-safe JavaScript
+- **React 18** - Modern React with hooks
+- **shadcn/ui** - Beautiful UI components
+- **Tailwind CSS** - Utility-first CSS framework
+- **Google APIs** - Gmail, Calendar, Meet integration
+- **React Query** - Data fetching and caching
+- **React Router** - Client-side routing
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/12fb13ed-d3e6-450d-baea-206f02c97b95) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Built with ❤️ using React, TypeScript, and Google APIs
