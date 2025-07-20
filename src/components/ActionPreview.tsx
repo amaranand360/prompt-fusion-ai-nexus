@@ -19,18 +19,24 @@ import {
   Edit3,
   CheckCircle,
   ArrowRight,
-  Zap
+  Zap,
+  Bug,
+  MessageSquare,
+  Hash,
+  UserPlus,
+  AlertCircle,
+  Tag
 } from 'lucide-react';
 
 export interface ActionPreviewData {
-  type: 'email' | 'calendar' | 'meeting' | 'other';
+  type: 'email' | 'calendar' | 'meeting' | 'jira' | 'slack' | 'other';
   action: string;
   data: {
     // Email fields
     recipients?: string[];
     subject?: string;
     body?: string;
-    
+
     // Calendar/Meeting fields
     title?: string;
     date?: string;
@@ -40,6 +46,20 @@ export interface ActionPreviewData {
     location?: string;
     description?: string;
     includeMeet?: boolean;
+
+    // Jira fields
+    projectKey?: string;
+    issueType?: string;
+    summary?: string;
+    priority?: string;
+    assignee?: string;
+    labels?: string[];
+
+    // Slack fields
+    channel?: string;
+    message?: string;
+    channelType?: 'public' | 'private';
+    members?: string[];
   };
 }
 

@@ -19,7 +19,9 @@ import {
   Users,
   Settings,
   Command,
-  BarChart3
+  BarChart3,
+  Bug,
+  Hash
 } from 'lucide-react';
 import { ThemeToggle } from '@/contexts/ThemeContext';
 import { useGoogleIntegration } from '@/contexts/GoogleIntegrationContext';
@@ -48,42 +50,42 @@ interface TrendingTask {
   icon: React.ComponentType<any>;
   category: string;
   priority: 'high' | 'medium' | 'low';
-  agent: 'gmail' | 'calendar' | 'orchestrator';
+  agent: 'gmail' | 'calendar' | 'orchestrator' | 'jira' | 'slack';
 }
 
 const trendingSearches: TrendingSearch[] = [
-  { id: '1', text: 'Send email summary of today\'s meetings', icon: Mail, category: 'gmail' },
+  { id: '1', text: 'Send project update email to team', icon: Mail, category: 'gmail' },
   { id: '2', text: 'Schedule weekly team standup with Google Meet', icon: Calendar, category: 'calendar' },
-  { id: '3', text: 'Create Google Meet for client presentation', icon: Video, category: 'meet' },
-  { id: '4', text: 'Find free time slots for next week', icon: Calendar, category: 'calendar' },
-  { id: '5', text: 'Compose follow-up email to project team', icon: Mail, category: 'gmail' },
-  { id: '6', text: 'Get daily briefing with emails and calendar', icon: Zap, category: 'orchestrator' }
+  { id: '3', text: 'Create Jira task for new feature development', icon: Bug, category: 'jira' },
+  { id: '4', text: 'Create Jira issue for bug report', icon: Bug, category: 'jira' },
+  { id: '5', text: 'Create Slack channel for project discussion', icon: Hash, category: 'slack' },
+  { id: '6', text: 'Send message to team Slack channel', icon: MessageSquare, category: 'slack' }
 ];
 
 const suggestedActions: SuggestedAction[] = [
   { id: '1', text: 'Send project update email', icon: Mail, description: 'Compose and send emails via Gmail' },
   { id: '2', text: 'Schedule team meeting', icon: Calendar, description: 'Create calendar events with Google Calendar' },
-  { id: '3', text: 'Create Google Meet for standup', icon: Video, description: 'Launch Google Meet with calendar integration' },
-  { id: '4', text: 'Read recent emails', icon: Mail, description: 'Get latest Gmail messages' },
-  { id: '5', text: 'Check today\'s schedule', icon: Calendar, description: 'View today\'s calendar events' },
-  { id: '6', text: 'Daily briefing', icon: Zap, description: 'Get email and calendar summary' }
+  { id: '3', text: 'Create Jira task', icon: Bug, description: 'Create tasks and issues in Jira' },
+  { id: '4', text: 'Create Jira issue', icon: Bug, description: 'Report bugs and issues in Jira' },
+  { id: '5', text: 'Create Slack channel', icon: Hash, description: 'Create new Slack channels and send messages' },
+  { id: '6', text: 'Send Slack message', icon: MessageSquare, description: 'Send messages to Slack channels' }
 ];
 
 const trendingTasks: TrendingTask[] = [
-  { id: '1', text: 'Send follow-up email to client about project status', icon: Mail, category: 'urgent', priority: 'high', agent: 'gmail' },
+  { id: '1', text: 'Send project status email to stakeholders', icon: Mail, category: 'urgent', priority: 'high', agent: 'gmail' },
   { id: '2', text: 'Schedule weekly team standup with Google Meet', icon: Calendar, category: 'recurring', priority: 'medium', agent: 'calendar' },
-  { id: '3', text: 'Create Google Meet for client presentation tomorrow', icon: Video, category: 'meeting', priority: 'high', agent: 'calendar' },
-  { id: '4', text: 'Get daily briefing with emails and calendar summary', icon: Zap, category: 'productivity', priority: 'medium', agent: 'orchestrator' },
-  { id: '5', text: 'Compose thank you email to team for project completion', icon: Mail, category: 'appreciation', priority: 'low', agent: 'gmail' },
-  { id: '6', text: 'Find available time slots for next week meetings', icon: Calendar, category: 'planning', priority: 'medium', agent: 'calendar' }
+  { id: '3', text: 'Create Jira task for API integration feature', icon: Bug, category: 'development', priority: 'high', agent: 'jira' },
+  { id: '4', text: 'Create Jira issue for login bug fix', icon: Bug, category: 'bug', priority: 'high', agent: 'jira' },
+  { id: '5', text: 'Create Slack channel for new project team', icon: Hash, category: 'communication', priority: 'medium', agent: 'slack' },
+  { id: '6', text: 'Send update message to development Slack channel', icon: MessageSquare, category: 'communication', priority: 'low', agent: 'slack' }
 ];
 
 const connectedTools = [
   { name: 'Google', icon: '🔍', color: 'bg-blue-500' },
-  { name: 'Drive', icon: '📁', color: 'bg-yellow-500' },
   { name: 'Gmail', icon: '📧', color: 'bg-red-500' },
   { name: 'Calendar', icon: '📅', color: 'bg-green-500' },
   { name: 'Slack', icon: '💬', color: 'bg-purple-500' },
+  { name: 'Jira', icon: '🐛', color: 'bg-blue-600' },
   { name: 'More', icon: '⋯', color: 'bg-gray-500' }
 ];
 

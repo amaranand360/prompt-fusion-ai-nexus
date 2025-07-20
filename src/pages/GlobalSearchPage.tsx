@@ -346,6 +346,370 @@ This meeting will help align our strategic direction and ensure we're building t
       };
     }
 
+    if (actionLower.includes('jira') || actionLower.includes('task') || actionLower.includes('issue') || actionLower.includes('bug')) {
+      // Generate rich demo data for Jira operations
+      let projectKey: string = 'ZEN';
+      let issueType: string = 'Task';
+      let summary: string = '';
+      let priority: string = 'Medium';
+      let assignee: string = 'current-user@company.com';
+      let labels: string[] = [];
+      let description: string = '';
+
+      if (actionLower.includes('task') || actionLower.includes('feature')) {
+        issueType = 'Task';
+        if (actionLower.includes('api') || actionLower.includes('integration')) {
+          summary = 'Implement API Integration for ZenBox AI';
+          priority = 'High';
+          labels = ['api', 'integration', 'backend'];
+          description = `**User Story:**
+As a developer, I want to implement a robust API integration system so that ZenBox AI can seamlessly connect with external services.
+
+**Acceptance Criteria:**
+• Design and implement RESTful API endpoints
+• Add proper authentication and authorization
+• Implement rate limiting and error handling
+• Create comprehensive API documentation
+• Add unit and integration tests
+
+**Technical Requirements:**
+• Use FastAPI framework for backend
+• Implement OAuth 2.0 for authentication
+• Add request/response validation
+• Include proper logging and monitoring
+
+**Definition of Done:**
+• All API endpoints are functional and tested
+• Documentation is complete and up-to-date
+• Code review is completed
+• Integration tests pass
+• Performance benchmarks are met`;
+        } else if (actionLower.includes('ui') || actionLower.includes('interface')) {
+          summary = 'Enhance User Interface for Global Search';
+          priority = 'Medium';
+          labels = ['ui', 'frontend', 'react'];
+          description = `**User Story:**
+As a user, I want an improved global search interface so that I can find and execute actions more efficiently.
+
+**Acceptance Criteria:**
+• Redesign search interface with modern UI components
+• Add real-time search suggestions
+• Implement action previews
+• Add keyboard shortcuts for power users
+• Ensure responsive design for all devices
+
+**Design Requirements:**
+• Follow existing design system
+• Maintain accessibility standards
+• Optimize for performance
+• Include loading states and animations
+
+**Definition of Done:**
+• UI components are implemented and tested
+• Design review is approved
+• Accessibility audit passes
+• Performance metrics are within targets
+• User testing feedback is incorporated`;
+        } else {
+          summary = 'Create New Feature for ZenBox AI Platform';
+          priority = 'Medium';
+          labels = ['feature', 'enhancement'];
+          description = `**User Story:**
+As a product manager, I want to implement a new feature that enhances user productivity and engagement.
+
+**Acceptance Criteria:**
+• Research and define feature requirements
+• Create technical specification
+• Implement feature with proper testing
+• Update documentation and user guides
+• Monitor feature adoption and performance
+
+**Technical Considerations:**
+• Ensure scalability and performance
+• Maintain code quality standards
+• Follow security best practices
+• Include proper error handling
+
+**Definition of Done:**
+• Feature is fully implemented and tested
+• Documentation is updated
+• Code review is completed
+• Feature flags are configured
+• Monitoring and analytics are in place`;
+        }
+      } else if (actionLower.includes('bug') || actionLower.includes('issue') || actionLower.includes('fix')) {
+        issueType = 'Bug';
+        priority = 'High';
+        if (actionLower.includes('login') || actionLower.includes('auth')) {
+          summary = 'Fix Authentication Login Issue';
+          labels = ['bug', 'authentication', 'critical'];
+          description = `**Bug Description:**
+Users are experiencing login failures when attempting to authenticate with Google OAuth.
+
+**Steps to Reproduce:**
+1. Navigate to login page
+2. Click "Sign in with Google"
+3. Complete Google OAuth flow
+4. Observe error message on redirect
+
+**Expected Behavior:**
+User should be successfully authenticated and redirected to dashboard.
+
+**Actual Behavior:**
+Error message appears: "Authentication failed. Please try again."
+
+**Environment:**
+• Browser: Chrome 120.0.6099.109
+• OS: macOS 14.2.1
+• Application Version: 1.2.3
+
+**Additional Information:**
+• Issue affects approximately 15% of users
+• Started occurring after recent OAuth library update
+• Workaround: Clear browser cache and cookies
+
+**Priority Justification:**
+This is blocking user access to the platform and affecting user experience.`;
+        } else if (actionLower.includes('search') || actionLower.includes('query')) {
+          summary = 'Fix Search Results Not Loading';
+          labels = ['bug', 'search', 'frontend'];
+          description = `**Bug Description:**
+Search results are not loading properly when users perform global searches.
+
+**Steps to Reproduce:**
+1. Enter search query in global search bar
+2. Press Enter or click search button
+3. Observe loading spinner continues indefinitely
+4. No results are displayed
+
+**Expected Behavior:**
+Search results should load within 2-3 seconds and display relevant items.
+
+**Actual Behavior:**
+Loading spinner continues indefinitely with no results shown.
+
+**Environment:**
+• Browser: Multiple browsers affected
+• Network: Both fast and slow connections
+• Application Version: 1.2.3
+
+**Technical Details:**
+• API endpoint returns 200 status
+• Frontend state management issue suspected
+• Console shows no JavaScript errors
+
+**Impact:**
+Core functionality is broken, affecting all users' ability to search.`;
+        } else {
+          summary = 'Fix Critical Application Bug';
+          labels = ['bug', 'critical'];
+          description = `**Bug Description:**
+A critical bug has been identified that affects core application functionality.
+
+**Steps to Reproduce:**
+1. Perform specific user action
+2. Observe unexpected behavior
+3. Check application logs for errors
+
+**Expected Behavior:**
+Application should function as designed without errors.
+
+**Actual Behavior:**
+Unexpected behavior occurs, potentially affecting user experience.
+
+**Environment:**
+• Multiple environments affected
+• Various user configurations
+• Application Version: Latest
+
+**Priority Justification:**
+This bug affects core functionality and needs immediate attention.
+
+**Next Steps:**
+• Investigate root cause
+• Implement fix with proper testing
+• Deploy to production with monitoring`;
+        }
+      }
+
+      return {
+        type: 'jira',
+        action,
+        data: {
+          projectKey,
+          issueType,
+          summary,
+          priority,
+          assignee,
+          labels,
+          description
+        }
+      };
+    }
+
+    if (actionLower.includes('slack') || actionLower.includes('channel') || actionLower.includes('message')) {
+      // Generate rich demo data for Slack operations
+      let channel: string = '';
+      let message: string = '';
+      let channelType: 'public' | 'private' = 'public';
+      let members: string[] = [];
+
+      if (actionLower.includes('channel') || actionLower.includes('create')) {
+        if (actionLower.includes('project')) {
+          channel = 'zenbox-ai-project';
+          channelType = 'public';
+          members = ['dev-team@company.com', 'product@company.com', 'design@company.com'];
+          message = `🚀 **Welcome to the ZenBox AI Project Channel!**
+
+This channel is dedicated to all discussions, updates, and collaboration related to the ZenBox AI project.
+
+📋 **Channel Purpose:**
+• Project updates and announcements
+• Technical discussions and problem-solving
+• Sprint planning and retrospectives
+• Resource sharing and documentation
+
+👥 **Team Members:**
+• Development Team
+• Product Management
+• Design Team
+• QA Engineers
+
+🎯 **Guidelines:**
+• Keep discussions project-related
+• Use threads for detailed technical discussions
+• Share relevant links and resources
+• Tag @here for urgent announcements only
+
+Let's build something amazing together! 💪`;
+        } else if (actionLower.includes('team')) {
+          channel = 'team-general';
+          channelType = 'public';
+          members = ['all-team@company.com'];
+          message = `👋 **Welcome to the Team General Channel!**
+
+This is our main communication hub for team-wide announcements and general discussions.
+
+🎯 **What to expect here:**
+• Company announcements
+• Team celebrations and achievements
+• General discussions and water cooler chat
+• Resource sharing and tips
+
+📢 **Communication Guidelines:**
+• Be respectful and inclusive
+• Keep it professional but friendly
+• Use appropriate channels for specific topics
+• Have fun and get to know your teammates!
+
+Looking forward to great conversations! 🌟`;
+        } else {
+          channel = 'new-project-channel';
+          channelType = 'public';
+          members = ['team@company.com'];
+          message = `🎉 **New Project Channel Created!**
+
+Welcome to our new project collaboration space.
+
+This channel will be used for:
+• Project coordination and updates
+• Team discussions and brainstorming
+• Resource sharing and documentation
+• Progress tracking and milestones
+
+Let's make this project a success! 🚀`;
+        }
+      } else if (actionLower.includes('message') || actionLower.includes('send') || actionLower.includes('update')) {
+        if (actionLower.includes('development') || actionLower.includes('dev')) {
+          channel = 'development';
+          message = `🔧 **Development Update - ZenBox AI**
+
+Hey team! Here's the latest update on our development progress:
+
+✅ **Completed This Sprint:**
+• Global search interface with action previews
+• Jira and Slack integration APIs
+• Enhanced error handling and fallback mechanisms
+• Comprehensive testing suite updates
+
+🚧 **Currently Working On:**
+• Performance optimization for large datasets
+• Mobile responsive design improvements
+• Advanced search filters and sorting
+• Real-time collaboration features
+
+🎯 **Next Sprint Goals:**
+• Complete beta testing phase
+• Implement user feedback
+• Prepare for production deployment
+• Documentation updates
+
+💡 **Technical Highlights:**
+• Reduced search response time by 40%
+• Improved API reliability to 99.9%
+• Added comprehensive logging and monitoring
+
+Questions or concerns? Drop them in the thread! 👇`;
+        } else if (actionLower.includes('standup') || actionLower.includes('daily')) {
+          channel = 'daily-standup';
+          message = `📅 **Daily Standup Reminder**
+
+Good morning team! 🌅
+
+Our daily standup is starting in 15 minutes. Please be ready to share:
+
+🎯 **What you accomplished yesterday**
+🚀 **What you're working on today**
+🚧 **Any blockers or challenges**
+
+📍 **Meeting Details:**
+• Time: 9:00 AM
+• Location: Conference Room A / Google Meet
+• Duration: 15 minutes max
+
+💡 **Quick Updates:**
+• Sprint progress: 75% complete
+• No critical blockers reported
+• Demo prep scheduled for Friday
+
+See you all there! Let's make today productive! 💪`;
+        } else {
+          channel = 'general';
+          message = `📢 **Team Update**
+
+Hi everyone! 👋
+
+Just wanted to share a quick update with the team:
+
+🎉 **Great News:**
+• Project milestones are on track
+• Team collaboration has been excellent
+• Client feedback has been very positive
+
+🎯 **Focus Areas:**
+• Continue maintaining high quality standards
+• Keep communication open and transparent
+• Support each other when challenges arise
+
+💪 **Team Appreciation:**
+Thank you all for your hard work and dedication. Your efforts are making a real difference!
+
+Have a great day! ☀️`;
+        }
+      }
+
+      return {
+        type: 'slack',
+        action,
+        data: {
+          channel,
+          message,
+          channelType,
+          members
+        }
+      };
+    }
+
     return {
       type: 'other',
       action,
